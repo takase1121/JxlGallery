@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
+import coil.dispose
 import coil.load
 import com.github.panpf.zoomimage.view.zoom.OnViewTapListener
 import com.github.takase1121.jxl_gallery.databinding.GalleryViewBinding
@@ -25,9 +26,9 @@ class ImagePagerAdapter(private val model: JxlGalleryModel) :
     override fun getItemCount() = items.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val loader =
-            ImageLoaderSingleton.getInstance(holder.binding.root.context.applicationContext)
-        holder.binding.photo.load(items[position], loader.imageLoader) {
+        val loader = model.imageLoader
+        holder.binding.photo.dispose()
+        holder.binding.photo.load(items[position], loader) {
             crossfade(true)
             listener(onStart = {
                 holder.binding.progress.visibility = View.VISIBLE

@@ -1,20 +1,33 @@
 package com.github.takase1121.jxl_gallery
 
 import android.os.Bundle
+import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.lifecycleScope
 import com.github.takase1121.jxl_gallery.databinding.JxlGalleryActivityBinding
 
-class JxlGalleryActivity: FragmentActivity() {
+class JxlGalleryActivity : FragmentActivity() {
     private lateinit var binding: JxlGalleryActivityBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = JxlGalleryActivityBinding.inflate(layoutInflater)
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragmentContainerView, FileSelectorFragment())
-            .commit()
+        val model: JxlGalleryModel by viewModels()
+        model.imageList.observe(this) { list ->
+            if (list.isEmpty()) {
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragmentContainerView, FileSelectorFragment())
+                    .commit()
+            } else {
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.fragmentContainerView, GalleryFragment())
+                    .addToBackStack(null)
+                    .commit()
+            }
+        }
         setContentView(binding.root)
         hideSystemBars()
     }

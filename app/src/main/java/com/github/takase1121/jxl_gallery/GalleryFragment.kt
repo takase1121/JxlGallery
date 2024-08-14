@@ -23,29 +23,34 @@ class GalleryFragment : Fragment() {
         binding.pager.offscreenPageLimit = 1
         val model: JxlGalleryModel by activityViewModels()
 
-        model.uri.observe(viewLifecycleOwner) {
+        model.imageList.observe(viewLifecycleOwner) {
             binding.pager.adapter = ImagePagerAdapter(model)
             binding.pager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
                 override fun onPageSelected(position: Int) {
                     super.onPageSelected(position)
-                    binding.seekbar.value = (position + 1).toFloat()
+                    model.setPosition(position + 1)
                 }
             })
-            val list = model.uri.value ?: emptyList()
+
+            binding.seekbar.valueFrom = 1F
+            binding.seekbar.stepSize = 1F
+            binding.seekbar.value = 1F
+            val list = model.imageList.value ?: emptyList()
             if (list.size > 1) {
                 binding.seekbar.valueFrom = 1F
                 binding.seekbar.valueTo = list.size.toFloat()
-                binding.seekbar.stepSize = 1F
-                binding.seekbar.value = 1F
             }
+
             var debounceSeek: Job? = null
             binding.seekbar.addOnChangeListener { _, value, _ ->
                 debounceSeek?.cancel()
                 debounceSeek = lifecycleScope.launch {
                     delay(100)
-                    binding.pager.currentItem = value.toInt() - 1
+                    model.setPosition(value.toInt())
                 }
             }
+
+            binding.total.text = list.size.toString()
         }
         model.overlay.observe(viewLifecycleOwner) { value ->
             if (value) {
@@ -56,6 +61,13 @@ class GalleryFragment : Fragment() {
                     binding.seek.visibility = View.GONE
                 }
             }
+        }
+        model.position.observe(viewLifecycleOwner) { position ->
+            if (binding.seekbar.value.toInt() != position)
+                binding.seekbar.value = position.toFloat()
+            if (binding.pager.currentItem != (position - 1))
+                binding.pager.currentItem = position - 1
+            binding.current.text = position.toString()
         }
         return binding.root
     }

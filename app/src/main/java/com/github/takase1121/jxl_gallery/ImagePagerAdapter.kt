@@ -15,7 +15,7 @@ class ImagePagerAdapter(private val model: JxlGalleryModel) :
     RecyclerView.Adapter<ImagePagerAdapter.ViewHolder>() {
     class ViewHolder(val binding: GalleryViewBinding) : RecyclerView.ViewHolder(binding.root)
 
-    private val items: List<Uri> = model.uri.value ?: emptyList()
+    private val items: List<Uri> = model.imageList.value ?: emptyList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater = LayoutInflater.from(parent.context)
@@ -48,7 +48,7 @@ class ImagePagerAdapter(private val model: JxlGalleryModel) :
         }
         holder.binding.photo.onViewTapListener = OnViewTapListener { _, _ ->
             val value = model.overlay.value
-            if (items.size > 1) model.overlay.value = !(value ?: false)
+            if (items.size > 1) model.setOverlay(!(value ?: false))
         }
     }
 }

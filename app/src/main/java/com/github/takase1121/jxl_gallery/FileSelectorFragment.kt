@@ -18,15 +18,10 @@ class FileSelectorFragment : Fragment() {
 
     private val openFileIntent =
         registerForActivityResult(ActivityResultContracts.OpenMultipleDocuments()) { uri ->
-            model.uri.value = uri
-
-            if (uri.isNotEmpty()) {
-                parentFragmentManager.beginTransaction()
-                    .replace(R.id.fragmentContainerView, GalleryFragment())
-                    .addToBackStack(null)
-                    .commit()
+            if (uri.isEmpty()) {
+                Toast.makeText(requireContext(), "No files selected", Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(requireContext(), "no files selected", Toast.LENGTH_SHORT)
+                model.setImageList(uri)
             }
         }
 
@@ -41,15 +36,11 @@ class FileSelectorFragment : Fragment() {
                     it.listFiles().filter { f -> f.isFile && f.type?.startsWith("image/") == true }
                         .map { f -> f.uri }
                 } ?: emptyList()
-                model.uri.value = list
 
-                if (list.isNotEmpty()) {
-                    parentFragmentManager.beginTransaction()
-                        .replace(R.id.fragmentContainerView, GalleryFragment())
-                        .addToBackStack(null)
-                        .commit()
+                if (list.isEmpty()) {
+                    Toast.makeText(requireContext(), "No files selected", Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(requireContext(), "no files selected", Toast.LENGTH_SHORT)
+                    model.setImageList(list)
                 }
             }
         }

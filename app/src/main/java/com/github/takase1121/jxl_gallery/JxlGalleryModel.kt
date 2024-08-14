@@ -16,7 +16,6 @@ class JxlGalleryModel(application: Application) : AndroidViewModel(application) 
     private val _overlay = MutableLiveData(false)
     private val _imageList = MutableLiveData<List<Uri>>(emptyList())
     private val _position = MutableLiveData(1)
-    private val _displayImage = MutableLiveData(false)
 
     val overlay: LiveData<Boolean> get() = _overlay
     val imageList: LiveData<List<Uri>> get() = _imageList

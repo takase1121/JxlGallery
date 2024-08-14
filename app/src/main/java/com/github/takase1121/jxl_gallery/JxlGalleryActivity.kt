@@ -1,13 +1,11 @@
 package com.github.takase1121.jxl_gallery
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.lifecycleScope
 import com.github.takase1121.jxl_gallery.databinding.JxlGalleryActivityBinding
 
 class JxlGalleryActivity : FragmentActivity() {

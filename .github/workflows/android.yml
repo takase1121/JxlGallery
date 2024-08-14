@@ -1,0 +1,46 @@
+name: APK
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+          cache: gradle
+
+      - name: Make wrapper executable
+        run: chmod +x ./gradlew
+
+      - name: Build (Debug)
+        run: ./gradlew assembleDebug
+
+      - name: Build (Release)
+        run: ./gradlew assemble
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug
+          path: app/build/outputs/apk/debug/
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release
+          path: app/build/outputs/apk/release/
+
+      - name: Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "app/build/outputs/apk/release/*.apk"

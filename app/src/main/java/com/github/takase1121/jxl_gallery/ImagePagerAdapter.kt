@@ -21,13 +21,10 @@ class ImagePagerAdapter(private val model: JxlGalleryModel) :
 
         fun load() {
             if (uri == null) return
-            binding.photo.dispose()
-            binding.photo.setImageDrawable(null)
             binding.photo.load(uri, loader) {
                 crossfade(true)
                 listener(onStart = {
                     Log.v("JxlGallery", "Loading image with URI $uri")
-                    binding.progress.visibility = View.VISIBLE
                 }, onSuccess = { _, _ ->
                     binding.progress.visibility = View.GONE
                 }, onCancel = {
@@ -57,11 +54,14 @@ class ImagePagerAdapter(private val model: JxlGalleryModel) :
     override fun getItemCount() = items.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.uri = items[position]
+        holder.binding.photo.dispose()
+        holder.binding.photo.setImageDrawable(null)
         holder.binding.photo.onViewTapListener = OnViewTapListener { _, _ ->
             val value = model.overlay.value
             if (items.size > 1) model.setOverlay(!(value ?: false))
         }
+        holder.binding.progress.visibility = View.VISIBLE
+        holder.uri = items[position]
         if (first) {
             holder.load()
             first = false

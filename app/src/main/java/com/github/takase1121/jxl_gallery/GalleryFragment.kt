@@ -4,9 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.get
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.github.takase1121.jxl_gallery.databinding.GalleryFragmentBinding
 import kotlinx.coroutines.Job
@@ -20,7 +22,6 @@ class GalleryFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding = GalleryFragmentBinding.inflate(inflater, container, false)
-        binding.pager.offscreenPageLimit = 1
         val model: JxlGalleryModel by activityViewModels()
 
         model.imageList.observe(viewLifecycleOwner) {
@@ -29,6 +30,18 @@ class GalleryFragment : Fragment() {
                 override fun onPageSelected(position: Int) {
                     super.onPageSelected(position)
                     model.setPosition(position + 1)
+                }
+
+                override fun onPageScrollStateChanged(state: Int) {
+                    super.onPageScrollStateChanged(state)
+                    if (state == ViewPager2.SCROLL_STATE_IDLE) {
+                        // only start loading when idle
+                        val viewHolder =
+                            (binding.pager[0] as RecyclerView).findViewHolderForAdapterPosition(
+                                binding.pager.currentItem
+                            )
+                        viewHolder?.let { (it as ImagePagerAdapter.ViewHolder).load() }
+                    }
                 }
             })
 
@@ -63,10 +76,10 @@ class GalleryFragment : Fragment() {
             }
         }
         model.position.observe(viewLifecycleOwner) { position ->
-            if (binding.seekbar.value.toInt() != position)
-                binding.seekbar.value = position.toFloat()
-            if (binding.pager.currentItem != (position - 1))
-                binding.pager.currentItem = position - 1
+            if (binding.seekbar.value.toInt() != position) binding.seekbar.value =
+                position.toFloat()
+            if (binding.pager.currentItem != (position - 1)) binding.pager.currentItem =
+                position - 1
             binding.current.text = position.toString()
         }
         return binding.root
